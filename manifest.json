@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "AtCoder Sample Copier",
+  "version": "1.0.0",
+  "description": "AtCoderの入出力例を一括でコピーするChrome拡張機能です。",
+  "permissions": [
+    "activeTab",
+    "clipboardWrite"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://atcoder.jp/contests/*/tasks/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ]
+}
