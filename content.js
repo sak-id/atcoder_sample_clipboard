@@ -1,35 +1,14 @@
 // Content script for AtCoder Sample Copier
-// ページ読み込み後に実行され、問題ページの入出力例を一括コピーするボタンを挿入します。
+// 拡張機能アイコンクリック時のメッセージを受信して入出力例をコピーします。
 
 (function() {
-  // ボタンの作成と挿入
-  function insertCopyButton() {
-    // 既に追加済みの場合は何もしない
-    if (document.getElementById('atcoder-sample-copier-button')) return;
-    const btn = document.createElement('button');
-    btn.id = 'atcoder-sample-copier-button';
-    btn.textContent = '入出力例をコピー';
-    // ボタンの簡易スタイル
-    btn.style.display = 'inline-block';
-    btn.style.margin = '10px 0';
-    btn.style.padding = '6px 12px';
-    btn.style.fontSize = '14px';
-    btn.style.color = '#ffffff';
-    btn.style.backgroundColor = '#6c63ff';
-    btn.style.border = 'none';
-    btn.style.borderRadius = '4px';
-    btn.style.cursor = 'pointer';
-    btn.style.zIndex = '9999';
-    btn.addEventListener('click', copySamples);
-    
-    // 挿入先: 問題文の先頭付近が見つかればその前に、無ければbodyに追加
-    const problemTitle = document.querySelector('.lang-ja h3, h3');
-    if (problemTitle && problemTitle.parentNode) {
-      problemTitle.parentNode.insertBefore(btn, problemTitle);
-    } else {
-      document.body.insertBefore(btn, document.body.firstChild);
+  // バックグラウンドスクリプトからのメッセージを受信
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === 'copySamples') {
+      copySamples();
+      sendResponse({ success: true });
     }
-  }
+  });
 
   // 入出力例の抽出とコピー処理
   function copySamples() {
@@ -144,10 +123,4 @@
     });
   }
 
-  // DOMContentLoaded でボタンを挿入
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', insertCopyButton);
-  } else {
-    insertCopyButton();
-  }
 })();

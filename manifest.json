@@ -8,6 +8,12 @@
     "clipboardWrite",
     "storage"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "入出力例をコピー"
+  },
   "options_page": "options.html",
   "content_scripts": [
     {
