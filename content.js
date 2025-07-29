@@ -46,7 +46,7 @@
       }
     });
     if (texts.length === 0) {
-      alert('入出力例が見つかりませんでした。');
+      showToast('入出力例が見つかりませんでした。', 'error');
       return;
     }
 
@@ -86,10 +86,46 @@
     });
   }
 
+  // トースト通知を表示する関数
+  function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: ${type === 'success' ? '#4caf50' : '#f44336'};
+      color: white;
+      padding: 12px 20px;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      font-size: 14px;
+      font-family: system-ui, sans-serif;
+      z-index: 10000;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.3s ease;
+    `;
+    document.body.appendChild(toast);
+    
+    // アニメーション開始
+    setTimeout(() => {
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(0)';
+    }, 10);
+    
+    // 3秒後に削除
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(100%)';
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
   // クリップボードへのコピー処理を分離
   function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
-      alert('入出力例をコピーしました。');
+      showToast('入出力例をコピーしました。');
     }).catch(() => {
       // 失敗時はフォールバックとしてテキストエリアを利用
       const textarea = document.createElement('textarea');
@@ -100,9 +136,9 @@
       textarea.select();
       try {
         document.execCommand('copy');
-        alert('入出力例をコピーしました。');
+        showToast('入出力例をコピーしました。');
       } catch (err) {
-        alert('コピーに失敗しました。');
+        showToast('コピーに失敗しました。', 'error');
       }
       textarea.remove();
     });
