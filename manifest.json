@@ -5,8 +5,10 @@
   "description": "AtCoderの入出力例を一括でコピーするChrome拡張機能です。",
   "permissions": [
     "activeTab",
-    "clipboardWrite"
+    "clipboardWrite",
+    "storage"
   ],
+  "options_page": "options.html",
   "content_scripts": [
     {
       "matches": [

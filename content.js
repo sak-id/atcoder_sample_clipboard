@@ -49,22 +49,51 @@
       alert('入出力例が見つかりませんでした。');
       return;
     }
-    // 入力と出力をセットで結合
-    let result = '';
-    for (let i = 0; i < texts.length; i += 2) {
-      const input = texts[i] ?? '';
-      const output = texts[i + 1] ?? '';
-      result += input + '\n' + output;
-      if (i + 2 < texts.length) result += '\n\n';
-    }
-    // クリップボードへ書き込む
-    navigator.clipboard.writeText(result).then(() => {
-      // ユーザに通知（ツールチップ等があればそちらでも可）
+
+    // 設定を読み込んでフォーマットを決定
+    chrome.storage.sync.get(['format'], (result) => {
+      const format = result.format || 'text';
+      let copyText = '';
+      
+      if (format === 'json') {
+        // JSON形式
+        const samples = [];
+        for (let i = 0; i < texts.length; i += 2) {
+          const input = texts[i] ?? '';
+          const output = texts[i + 1] ?? '';
+          samples.push({
+            input: input,
+            expected: output
+          });
+        }
+        const jsonData = {
+          problem_url: window.location.href,
+          samples: samples
+        };
+        copyText = JSON.stringify(jsonData, null, 2);
+      } else {
+        // 平文形式（従来通り）
+        for (let i = 0; i < texts.length; i += 2) {
+          const input = texts[i] ?? '';
+          const output = texts[i + 1] ?? '';
+          copyText += input + '\n' + output;
+          if (i + 2 < texts.length) copyText += '\n\n';
+        }
+      }
+      
+      // クリップボードへ書き込む
+      copyToClipboard(copyText);
+    });
+  }
+
+  // クリップボードへのコピー処理を分離
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
       alert('入出力例をコピーしました。');
     }).catch(() => {
       // 失敗時はフォールバックとしてテキストエリアを利用
       const textarea = document.createElement('textarea');
-      textarea.value = result;
+      textarea.value = text;
       textarea.style.position = 'fixed';
       textarea.style.left = '-1000px';
       document.body.appendChild(textarea);
