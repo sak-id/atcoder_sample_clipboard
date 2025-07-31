@@ -44,13 +44,19 @@
       if (format === 'json') {
         // JSON形式
         const samples = [];
+        const seenPairs = new Set();
         for (let i = 0; i < texts.length; i += 2) {
           const input = texts[i] ?? '';
           const output = texts[i + 1] ?? '';
-          samples.push({
-            input: input,
-            expected: output
-          });
+          const pairKey = `${input}|${output}`;
+          // サンプルペアの重複を除去
+          if (!seenPairs.has(pairKey)) {
+            seenPairs.add(pairKey);
+            samples.push({
+              input: input,
+              expected: output
+            });
+          }
         }
         const jsonData = {
           problem_url: window.location.href,
@@ -59,11 +65,19 @@
         copyText = JSON.stringify(jsonData, null, 2);
       } else {
         // 平文形式（従来通り）
+        const seenPairs = new Set();
+        let first = true;
         for (let i = 0; i < texts.length; i += 2) {
           const input = texts[i] ?? '';
           const output = texts[i + 1] ?? '';
-          copyText += input + '\n' + output;
-          if (i + 2 < texts.length) copyText += '\n\n';
+          const pairKey = `${input}|${output}`;
+          // サンプルペアの重複を除去
+          if (!seenPairs.has(pairKey)) {
+            seenPairs.add(pairKey);
+            if (!first) copyText += '\n\n';
+            copyText += input + '\n' + output;
+            first = false;
+          }
         }
       }
       
