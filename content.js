@@ -12,15 +12,22 @@
 
   // 入出力例の抽出とコピー処理
   function copySamples() {
-    // すべての pre-sample プレ要素を取得
-    const preNodes = document.querySelectorAll("pre[id^='pre-sample']");
+    // すべての pre-sample プレ要素を取得してIDでソート
+    const preNodes = Array.from(document.querySelectorAll("pre[id^='pre-sample']"));
+    preNodes.sort((a, b) => {
+      const numA = parseInt(a.id.replace('pre-sample', ''));
+      const numB = parseInt(b.id.replace('pre-sample', ''));
+      return numA - numB;
+    });
+    
     const texts = [];
-    const seen = new Set();
+    const seenIds = new Set();
     preNodes.forEach(pre => {
       const text = pre.textContent.trim();
-      // 同じ内容が日本語・英語で重複していることがあるため、重複を除外
-      if (!seen.has(text)) {
-        seen.add(text);
+      const id = pre.id;
+      // 同じID（日本語・英語で重複していることがある）を除外
+      if (!seenIds.has(id)) {
+        seenIds.add(id);
         texts.push(text);
       }
     });
