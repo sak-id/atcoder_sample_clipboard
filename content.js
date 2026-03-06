@@ -13,7 +13,9 @@
   // 入出力例の抽出とコピー処理
   function copySamples() {
     // すべての pre-sample プレ要素を取得してIDでソート
-    const preNodes = Array.from(document.querySelectorAll("pre[id^='pre-sample']"));
+    const preNodes = Array.from(document.querySelectorAll("pre[id^='pre-sample']"))
+      .filter((pre) => pre.id !== 'pre-sample0')
+      .filter((pre) => pre.closest('.lang-ja'));
     preNodes.sort((a, b) => {
       const numA = parseInt(a.id.replace('pre-sample', ''));
       const numB = parseInt(b.id.replace('pre-sample', ''));
@@ -54,7 +56,7 @@
             seenPairs.add(pairKey);
             samples.push({
               input: input,
-              expected: output
+              expected: ensureTrailingNewline(output)
             });
           }
         }
@@ -84,6 +86,13 @@
       // クリップボードへ書き込む
       copyToClipboard(copyText);
     });
+  }
+
+  function ensureTrailingNewline(text) {
+    if (!text || text.endsWith('\n')) {
+      return text;
+    }
+    return `${text}\n`;
   }
 
   // トースト通知を表示する関数
