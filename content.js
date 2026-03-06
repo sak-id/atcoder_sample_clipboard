@@ -13,8 +13,22 @@
   // 入出力例の抽出とコピー処理
   function copySamples() {
     // すべての pre-sample プレ要素を取得してIDでソート
+    const jaContainer = document.querySelector('.lang-ja');
+    const ioStyles = Array.from(document.querySelectorAll('.io-style'));
+    const ioStyle =
+      ioStyles.find((element) => jaContainer && jaContainer.contains(element)) ||
+      ioStyles[0] ||
+      null;
     const preNodes = Array.from(document.querySelectorAll("pre[id^='pre-sample']"))
-      .filter((pre) => pre.id !== 'pre-sample0')
+      .filter((pre) => {
+        if (!ioStyle) {
+          return true;
+        }
+        const relation = ioStyle.compareDocumentPosition(pre);
+        const isAfterIoStyle = Boolean(relation & Node.DOCUMENT_POSITION_FOLLOWING);
+        const isInsideIoStyle = ioStyle.contains(pre);
+        return isAfterIoStyle && !isInsideIoStyle;
+      })
       .filter((pre) => pre.closest('.lang-ja'));
     preNodes.sort((a, b) => {
       const numA = parseInt(a.id.replace('pre-sample', ''));
